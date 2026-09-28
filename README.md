@@ -22,14 +22,14 @@ Built as part of the Log(N) Pacific Cyber Range capstone, using Microsoft Defend
 ## How I built it
 
 ```mermaid
-flowchart LR
-    I["Internet attackers"] -->|"RDP 3389, MySQL 3306"| N["NSG<br/>deny all, then allow all"]
-    N --> VM["Windows 11 VM<br/>MySQL 8.0 with dummy data<br/>weak Administrator, Guest, network root"]
-    VM -->|"mysql_general.log"| AMA["Azure Monitor Agent<br/>custom text log DCR"]
-    AMA --> LAW["Log Analytics workspace<br/>MySQLAudit_CL table"]
-    VM -->|"device telemetry"| MDE["Defender for Endpoint<br/>DeviceLogonEvents, DeviceProcessEvents..."]
-    MDE --> LAW
-    LAW --> S["Sentinel analytics rules<br/>successful VM and MySQL logons"]
+flowchart TD
+    A["Internet attackers"] -->|"RDP 3389 and MySQL 3306"| B["NSG opened to all inbound"]
+    B --> C["Windows 11 VM running MySQL<br/>weak passwords on purpose"]
+    C -->|"MySQL query log"| D["Azure Monitor Agent"]
+    C -->|"device telemetry"| E["Defender for Endpoint"]
+    D --> F["Log Analytics workspace"]
+    E --> F
+    F --> G["Sentinel rules and KQL hunting"]
 ```
 
 The build followed a **"harden first, expose last"** order, so the logging and detections were in place before any attacker could arrive:
